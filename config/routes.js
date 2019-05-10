@@ -20,13 +20,28 @@ function register(req, res) {
       res.status(201).json({token});
     })
     .catch(err => {
-      console.log(err)
       res.status(500).json({ error: 'Could not create the new user.' })
     })
 }
 
 function login(req, res) {
-  // implement user login
+  let { username, password } = req.body;
+  db.get({username})
+    .then(user => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        const token = genToken(user);
+        res.status(200).json({token});
+      } else {
+        res.status(401).json({
+          error: 'Invalid credentials.'
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: 'Could not check credentials against our records.'
+      });
+    });
 }
 
 function getJokes(req, res) {

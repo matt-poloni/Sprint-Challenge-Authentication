@@ -4,14 +4,11 @@ module.exports = function(tbl) {
   return {
     register,
     get,
-    post,
   }
 
   async function register(creds) {
     const [id] = await post(creds);
-    const result = await get({id});
-    console.log(result)
-    return result;
+    return await get({id});
   }
 
   function get(val) {

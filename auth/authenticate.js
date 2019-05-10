@@ -34,9 +34,8 @@ function genToken(u) {
     subject: u.id,
     username: u.username
   }
-  scrt = process.env.JWT_SECRET || 'add this to .env file'
   const opt = {
     expiresIn: '24hr',
   }
-  return jwt.sign(pyld, scrt, opt);
+  return jwt.sign(pyld, jwtKey, opt);
 }
