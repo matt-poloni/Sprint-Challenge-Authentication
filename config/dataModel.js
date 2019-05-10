@@ -8,7 +8,7 @@ module.exports = function(tbl) {
 
   async function register(creds) {
     const [id] = await post(creds);
-    return await get({id});
+    return get({id});
   }
 
   function get(val) {
