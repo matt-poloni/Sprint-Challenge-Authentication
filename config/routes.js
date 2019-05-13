@@ -1,6 +1,8 @@
 const axios = require('axios');
+const bcrypt = require('bcryptjs');
+const db = require('./dataModel')('users');
 
-const { authenticate } = require('../auth/authenticate');
+const { authenticate, genToken } = require('../auth/authenticate');
 
 module.exports = server => {
   server.post('/api/register', register);
@@ -9,11 +11,37 @@ module.exports = server => {
 };
 
 function register(req, res) {
-  // implement user registration
+  let u = req.body;
+  const hash = bcrypt.hashSync(u.password, 10);
+  u.password = hash;
+  db.register(u)
+    .then(user => {
+      const token = genToken(user);
+      res.status(201).json({token});
+    })
+    .catch(err => {
+      res.status(500).json({ error: 'Could not create the new user.' })
+    })
 }
 
 function login(req, res) {
-  // implement user login
+  let { username, password } = req.body;
+  db.get({username})
+    .then(user => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        const token = genToken(user);
+        res.status(200).json({token});
+      } else {
+        res.status(401).json({
+          error: 'Invalid credentials.'
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: 'Could not check credentials against our records.'
+      });
+    });
 }
 
 function getJokes(req, res) {
